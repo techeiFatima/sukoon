@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test:rls": "bash scripts/test-rls.sh"
+    "test:rls": "bash scripts/test-rls.sh",
+    "test:unit": "node --no-warnings --conditions=react-server --experimental-strip-types tests/youtube-parser.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",

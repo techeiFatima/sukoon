@@ -142,6 +142,23 @@ export interface AlignmentReflection extends Row {
   small_change: string | null;
 }
 
+export interface LectureSource extends Row {
+  channel_id: string;
+  name: string;
+}
+
+export interface SavedLecture extends Row {
+  video_id: string;
+  title: string;
+  channel_id: string;
+  channel_name: string;
+  published_at: string | null;
+  topic_slug: string | null;
+  status: "to_watch" | "watched";
+  takeaway: string | null;
+  watched_at: string | null;
+}
+
 export interface TableMap {
   daily_intentions: DailyIntention;
   reflections: Reflection;
@@ -158,6 +175,8 @@ export interface TableMap {
   focus_sessions: FocusSession;
   offline_actions: OfflineAction;
   alignment_reflections: AlignmentReflection;
+  lecture_sources: LectureSource;
+  saved_lectures: SavedLecture;
 }
 
 export type TableName = keyof TableMap;
@@ -177,6 +196,8 @@ export const TABLES = [
   "focus_sessions",
   "offline_actions",
   "alignment_reflections",
+  "lecture_sources",
+  "saved_lectures",
 ] as const satisfies readonly TableName[];
 
 /** Fields the caller supplies; ids, ownership and timestamps are managed by the store. */

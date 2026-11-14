@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Test fixture written to match the structure of YouTube's public channel
+     Atom feed (yt/media namespaces). Titles and IDs are invented. -->
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?channel_id=UCaaaaaaaaaaaaaaaaaaaaaa"/>
+ <id>yt:channel:aaaaaaaaaaaaaaaaaaaaaa</id>
+ <yt:channelId>aaaaaaaaaaaaaaaaaaaaaa</yt:channelId>
+ <title>Example Teacher &amp; Friends</title>
+ <link rel="alternate" href="https://www.youtube.com/channel/UCaaaaaaaaaaaaaaaaaaaaaa"/>
+ <author><name>Example Teacher &amp; Friends</name><uri>https://www.youtube.com/channel/UCaaaaaaaaaaaaaaaaaaaaaa</uri></author>
+ <published>2015-01-01T00:00:00+00:00</published>
+ <entry>
+  <id>yt:video:AbCdEfGhIj1</id>
+  <yt:videoId>AbCdEfGhIj1</yt:videoId>
+  <yt:channelId>UCaaaaaaaaaaaaaaaaaaaaaa</yt:channelId>
+  <title>On Patience &#8212; &quot;Sabr&quot; in Daily Life</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=AbCdEfGhIj1"/>
+  <author><name>Example Teacher &amp; Friends</name><uri>https://www.youtube.com/channel/UCaaaaaaaaaaaaaaaaaaaaaa</uri></author>
+  <published>2026-11-10T18:00:00+00:00</published>
+  <updated>2026-11-11T09:00:00+00:00</updated>
+  <media:group><media:title>On Patience</media:title><media:thumbnail url="https://i1.ytimg.com/vi/AbCdEfGhIj1/hqdefault.jpg" width="480" height="360"/><media:description>A talk.</media:description></media:group>
+ </entry>
+ <entry>
+  <id>yt:video:Short123456</id>
+  <yt:videoId>Short123456</yt:videoId>
+  <title>A quick clip</title>
+  <link rel="alternate" href="https://www.youtube.com/shorts/Short123456"/>
+  <published>2026-11-12T18:00:00+00:00</published>
+ </entry>
+ <entry>
+  <id>yt:video:bad</id>
+  <yt:videoId>not-valid</yt:videoId>
+  <title>Malformed entry</title>
+ </entry>
+ <entry>
+  <id>yt:video:ZyXwVuTsRq0</id>
+  <yt:videoId>ZyXwVuTsRq0</yt:videoId>
+  <title><![CDATA[Gratitude & Contentment]]></title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=ZyXwVuTsRq0"/>
+  <published>2026-11-01T18:00:00+00:00</published>
+ </entry>
+</feed>

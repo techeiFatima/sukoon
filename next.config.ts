@@ -11,7 +11,9 @@ const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'" + (process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""),
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  "img-src 'self' data: blob: https://i.ytimg.com",
+  // Lectures play in YouTube's privacy-enhanced player only.
+  "frame-src https://www.youtube-nocookie.com",
   "font-src 'self' data:",
   `connect-src ${connectSrc}`,
   "frame-ancestors 'none'",

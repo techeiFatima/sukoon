@@ -38,6 +38,13 @@ select pg_temp.expect_eq((select count(*) from public.reflections where user_id 
 select pg_temp.expect_fail(format('insert into public.reflections (user_id, kind, date, body) values (%L, ''journal'', current_date, ''forged'')', :B), 'A cannot insert rows as B');
 select pg_temp.expect_fail(format('insert into public.profiles (id) values (%L)', :B), 'A cannot create B''s profile');
 select pg_temp.expect_fail('update public.profiles set ai_mode = ''cloud''', 'cloud AI requires recorded consent');
+insert into public.saved_lectures (video_id, title, channel_id, channel_name)
+  select 'AbCdEfGhIj' || g, 'Lecture ' || g, 'UCaaaaaaaaaaaaaaaaaaaaaa', 'Teacher' from generate_series(1, 5) g;
+select pg_temp.expect_fail('insert into public.saved_lectures (video_id, title, channel_id, channel_name) values (''AbCdEfGhIj6'', ''Sixth'', ''UCaaaaaaaaaaaaaaaaaaaaaa'', ''Teacher'')', 'watch list capped at 5');
+update public.saved_lectures set status = 'watched' where video_id = 'AbCdEfGhIj1';
+insert into public.saved_lectures (video_id, title, channel_id, channel_name) values ('AbCdEfGhIj6', 'Sixth', 'UCaaaaaaaaaaaaaaaaaaaaaa', 'Teacher');
+select pg_temp.expect_eq((select count(*) from public.saved_lectures where status = 'to_watch'), 5, 'watching one frees a slot');
+select pg_temp.expect_fail('insert into public.lecture_sources (channel_id, name) values (''not-a-channel'', ''x'')', 'lecture source requires a valid channel ID');
 
 reset role;
 select id as a_note from public.knowledge_notes where title = 'Linear algebra' \gset
@@ -48,6 +55,9 @@ select set_config('request.jwt.claim.sub', :B, false);
 select pg_temp.expect_eq((select count(*) from public.reflections), 0, 'B cannot read A''s reflections');
 select pg_temp.expect_eq((select count(*) from public.profiles), 0, 'B cannot read A''s profile');
 select pg_temp.expect_eq((select count(*) from public.knowledge_notes), 0, 'B cannot read A''s notes');
+select pg_temp.expect_eq((select count(*) from public.saved_lectures), 0, 'B cannot read A''s watch list');
+insert into public.saved_lectures (video_id, title, channel_id, channel_name) values ('AbCdEfGhIj7', 'B lecture', 'UCaaaaaaaaaaaaaaaaaaaaaa', 'Teacher');
+select pg_temp.expect_eq((select count(*) from public.saved_lectures), 1, 'B''s watch-list cap is independent of A''s');
 update public.reflections set body = 'tampered';
 delete from public.reflections;
 insert into public.knowledge_notes (title) values ('B note');

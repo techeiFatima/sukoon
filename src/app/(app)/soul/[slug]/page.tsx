@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowUpRight, Check, Plus } from "lucide-react";
 import { useApp, useStore } from "@/lib/app-context";
 import { localDate } from "@/lib/dates";
 import { useAutosaveReflection } from "@/lib/useAutosave";
+import { useCollection } from "@/lib/hooks";
 import { CONTENT_REVIEW_NOTE, quranUrl, topicBySlug, TOPICS, TRADITION_POLICY, TRANSLATION_NOTE } from "@/content/islamic";
 import { cx, EmptyState, SavedHint, TextArea } from "@/components/ui";
 
@@ -17,6 +18,7 @@ export default function TopicPage() {
   const store = useStore();
   const [prompt, setPrompt] = useState<string | null>(null);
   const [added, setAdded] = useState<string[]>([]);
+  const lectures = useCollection("saved_lectures", { eq: { topic_slug: slug } });
   const notes = useAutosaveReflection({ kind: "soul", context: slug, prompt: prompt ?? topic?.name ?? null });
 
   if (!topic) {
@@ -132,6 +134,22 @@ export default function TopicPage() {
           })}
         </ul>
       </section>
+
+      {lectures.items.length > 0 && (
+        <section className="mt-16" aria-labelledby="l-h">
+          <h2 id="l-h" className="eyebrow mb-5">Lectures you’ve linked</h2>
+          <ul className="space-y-4">
+            {lectures.items.map((l) => (
+              <li key={l.id} className="border-l-2 border-sand pl-5">
+                <p className="font-serif text-lg text-forest">{l.title}</p>
+                <p className="text-[12px] text-muted">{l.channel_name} · {l.status === "watched" ? "watched" : "on your watch list"}</p>
+                {l.takeaway && <p className="mt-1 text-[14px] text-ink">{l.takeaway}</p>}
+              </li>
+            ))}
+          </ul>
+          <Link href="/soul?tab=lectures" className="mt-4 inline-block text-[13px] text-forest underline underline-offset-4">Open lectures</Link>
+        </section>
+      )}
 
       <section className="mt-16 card p-7 md:p-9" aria-labelledby="n-h">
         <div className="mb-4 flex items-center justify-between">

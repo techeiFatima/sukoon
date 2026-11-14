@@ -6,9 +6,10 @@ import { useApp } from "@/lib/app-context";
 import { useCollection } from "@/lib/hooks";
 import { CONTENT_REVIEW_NOTE, TOPICS } from "@/content/islamic";
 import { Journal } from "@/components/soul/Journal";
+import { Lectures } from "@/components/soul/Lectures";
 import { PageHeader, Tabs } from "@/components/ui";
 
-type Tab = "journey" | "journal";
+type Tab = "journey" | "lectures" | "journal";
 
 export default function Soul() {
   const { profile } = useApp();
@@ -16,22 +17,22 @@ export default function Soul() {
   const [tab, setTab] = useState<Tab>(islamic ? "journey" : "journal");
   useEffect(() => {
     const t = new URLSearchParams(window.location.search).get("tab");
-    if (t === "journey" || t === "journal") setTab(t);
+    if (t === "journey" || t === "journal" || t === "lectures") setTab(t);
   }, []);
 
   const tabs: { id: Tab; label: string }[] = islamic
-    ? [{ id: "journey", label: "Islamic journey" }, { id: "journal", label: "Personal reflection" }]
-    : [{ id: "journal", label: "Personal reflection" }, { id: "journey", label: "Islamic journey" }];
+    ? [{ id: "journey", label: "Islamic journey" }, { id: "lectures", label: "Lectures" }, { id: "journal", label: "Personal reflection" }]
+    : [{ id: "journal", label: "Personal reflection" }, { id: "journey", label: "Islamic journey" }, { id: "lectures", label: "Lectures" }];
 
   return (
     <div>
       <PageHeader eyebrow="Soul" title="Tend to your inner life">
         {islamic
-          ? "Ten foundational concepts of Islamic spirituality, each with its sources, questions to sit with, and small practices — alongside a private journal for honest self-reflection."
+          ? "Ten foundational concepts of Islamic spirituality with their sources and practices, a small library of lectures from trusted teachers, and a private journal for honest self-reflection."
           : "A private journal for honest self-reflection. If you’re curious, you can also explore the Islamic tradition of inner development."}
       </PageHeader>
       <Tabs tabs={tabs} value={tab} onChange={setTab} />
-      {tab === "journey" ? <Journey /> : <Journal />}
+      {tab === "journey" ? <Journey /> : tab === "lectures" ? <Lectures /> : <Journal />}
     </div>
   );
 }

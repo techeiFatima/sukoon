@@ -51,7 +51,7 @@ Email confirmation can stay on. If someone completes onboarding before confirmin
 
 ### Database and security
 
-`supabase/migrations/20261114000000_init.sql` creates `profiles` (extending `auth.users`) and these tables: `daily_intentions`, `reflections`, `attention_checkins`, `personal_values`, `commitments`, `learning_journeys`, `knowledge_notes`, `knowledge_connections`, `saved_resources`, `personal_goals`, plus supporting tables `diet_items`, `boundaries`, `focus_sessions`, `offline_actions` and `alignment_reflections`.
+`supabase/migrations/20261114000000_init.sql` creates `profiles` (extending `auth.users`) and these tables: `daily_intentions`, `reflections`, `attention_checkins`, `personal_values`, `commitments`, `learning_journeys`, `knowledge_notes`, `knowledge_connections`, `saved_resources`, `personal_goals`, plus supporting tables `diet_items`, `boundaries`, `focus_sessions`, `offline_actions`, `alignment_reflections`, `lecture_sources` and `saved_lectures`. Apply both files in `supabase/migrations/` in order.
 
 - RLS is enabled and forced on every table. Each table has select/insert/update/delete policies restricted to `user_id = auth.uid()`, and `anon` has no grants.
 - `user_id` defaults to `auth.uid()`, and the insert/update checks stop anyone from writing rows as another user or moving a row to someone else.
@@ -65,7 +65,7 @@ Email confirmation can stay on. If someone completes onboarding before confirmin
 npm run test:rls
 ```
 
-It starts a throwaway Postgres, adds a minimal stand-in for Supabase's `auth` schema, applies the migration, and runs 17 checks covering cross-user reads and writes, forged `user_id`, row transfer, anon access, the consent constraint, and account deletion.
+It starts a throwaway Postgres, adds a minimal stand-in for Supabase's `auth` schema, applies the migration, and runs 22 checks covering cross-user reads and writes, forged `user_id`, row transfer, anon access, the consent constraint, the lecture watch-list cap, and account deletion.
 
 ## AI reflection companion
 
@@ -95,6 +95,19 @@ All Islamic content is curated by hand in `src/content/islamic.ts`. None of it i
 
 "Thought of the day" quotations (`src/content/thoughts.ts`) are real and attributed, with a note where wording depends on the translation.
 
+## Lecture library
+
+Soul → Lectures shows a few recent talks from vetted channels and from channels the person adds. It is built to support action, not consumption:
+
+- **No feed.** Only the 3–4 most recent talks per source are shown. YouTube Shorts are skipped. There is no autoplay and no recommendations.
+- **The watch list holds 5 at most.** This is enforced in the UI and by a database trigger.
+- **Every lecture ends with a question:** *"What is one thing you'll practise this week?"* The answer is kept, and can be added to Today's commitments with one click. Lectures can be linked to Soul topics, where they appear alongside the person's notes.
+- **Privacy.** Videos play in YouTube's privacy-enhanced player (`youtube-nocookie.com`). The server reads YouTube's public per-channel RSS/Atom feed, which needs no API key and sends no user data, and caches it for an hour.
+
+**Adding vetted sources.** `src/content/lectures.ts` ships with an **empty** vetted list on purpose: choosing which teachers Sukoon presents is an editorial and religious decision. The file explains the format. Each entry has a `tradition` (`sunni`, `shia` or `general`), which filters what people see according to the tradition they set in Settings, a note explaining why the source is included, and optional Soul topics.
+
+**Not verified yet:** live fetching from YouTube was not tested in development, because the build sandbox could not reach youtube.com. The feed parser is tested against a sample feed in YouTube's format (`npm run test:unit`), and the UI was tested with stubbed API responses. Check that adding a channel works once you deploy. Resolving `@handle` links relies on reading the channel page and may break if YouTube changes its markup; pasting a `youtube.com/channel/UC…` link always works. Also review YouTube's Terms of Service for embedding and feed use before a public launch.
+
 ## Features
 
 **Onboarding:** a six-step welcome covering motivations, experience, values, what the person would like to change, and creating their space. In Cloud Mode the last step is account creation.
@@ -109,6 +122,7 @@ All Islamic content is curated by hand in `src/content/islamic.ts`. None of it i
 
 **Soul**
 - Islamic journey: 10 topics (Niyyah, Taqwa, Muhasabah, Muraqabah, Tazkiyah, Sabr, Shukr, Tawakkul, Zuhd, Ihsan). Each has an explanation, Qur'an passages, hadith, notes across traditions, questions to sit with, practices that can be added to today's commitments, and autosaved private notes.
+- Lectures: a small library of talks from trusted YouTube channels (see below).
 - Personal journal: five prompts, a calendar of past entries, search, and editing.
 
 **Intellect**
@@ -156,6 +170,7 @@ Stack: Next.js 16 (App Router, Turbopack), React 19, TypeScript, Tailwind CSS 4,
 | `npm run typecheck` | TypeScript |
 | `npm run lint` | ESLint (Next + React Compiler rules) |
 | `npm run test:rls` | Database security tests |
+| `npm run test:unit` | YouTube feed parser test |
 
 ## Deploying to Vercel
 
@@ -169,6 +184,7 @@ Stack: Next.js 16 (App Router, Turbopack), React 19, TypeScript, Tailwind CSS 4,
 - **Supabase project:** required for accounts, sync, and server-side storage.
 - **Anthropic API key:** required for cloud reflection. Without it, the on-device guide is used.
 - **Scholarly review** of `src/content/islamic.ts`, and curated references from Shia hadith collections.
+- **Vetted lecture channels** in `src/content/lectures.ts` (empty by design), plus a live test of YouTube feed fetching.
 - **Distributed rate limiting:** the API limiter is per-instance and in memory. Use a shared store (for example Redis) for multi-region production.
 - **App blocking or screen-time data:** not possible on the web. It would need native iOS (Screen Time API) or Android integrations.
 - **OAuth sign-in (Google or Apple)** and **end-to-end encryption** of journals: not implemented. Today, cloud reflections are protected by RLS and Supabase's encryption at rest, but not by client-side encryption.
